@@ -2,7 +2,7 @@
 <head>
 <link rel="StyleSheet" href="style.css" type="text/css" media="all" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Neural Task Success Classifiers</title>
+<title>AWET</title>
 <style type="text/css">
 #primarycontent h1 {
   font-variant: small-caps;
@@ -80,14 +80,12 @@
 </head>
 <body>
 <div id="primarycontent">
-<h1 align="center" itemprop="name">Neural Task Success Classifiers for Robotic Manipulation from Few Real Demonstrations</h1>
+<h1 align="center" itemprop="name">AWET: Robot Policy Learning from Demonstration with Advantage Weighting and Early Termination</h1>
 
 <center>
 <ul id="people" itemprop="accountablePerson">
   <li><h4>
         <a href="http://mohtasib.github.io/">Abdalkarim Mohtasib</a>,
-        <a href="">Amir Ghalamzan E.</a>,
-        <a href="">Nicola Bellotto</a>,
         <a href="">Heriberto Cuayahuitl</a>
   <li>Lincoln Centre for Autonomous Systems</li>
   <li>University of Lincoln</li>
@@ -95,79 +93,24 @@
   <br />
   <li>
       <a href="http://mohtasib.github.io/">Paper</a> |
-      <a href="https://github.com/Mohtasib/RewardLearning">Code</a> |
-      <a href="https://github.com/Mohtasib/RewardLearning">Data</a>
+      <a href="https://github.com/Mohtasib/AWET_RL">Code</a> |
+      <a href="https://github.com/Mohtasib/AWET_RL">Data</a>
   </li>
 </ul>
 </center>
 
 <h3 style="clear:both">Abstract</h3>
 <p style="padding-left: 10px; padding-right: 10px;">
-  Robots learning a new manipulation task from a small amount of demonstrations are increasingly demanded in different workspaces. A classifier model assessing the quality of actions can predict the successful completion of a task, which can be used by intelligent agents for action-selection. This paper presents a novel classifier that learns to classify task completion only from a few demonstrations. We carry out a comprehensive comparison of different neural classifiers, e.g. fully connected-based, fully convolutional-based, sequence2sequence-based, and domain adaptation-based classification. We also present a new dataset including five robot manipulation tasks, which is publicly available. We compared the performances of our novel classifier and the existing models using our dataset and the MIME dataset. The results suggest domain adaptation and timing-based features improve success prediction. Our novel model, i.e. fully convolutional neural network with domain adaptation and timing features, achieves an average classification accuracy of 97.3% and 95.5% across tasks in both datasets whereas state-of-the-art classifiers without domain adaptation and timing-features only achieve 82.4% and 90.3%, respectively.
+  Learning robotic tasks in the real world is still challenging and has not been fully solved. The traditional methods used in this domain are imitation learning and reinforcement learning. However, they both have limitations when applied to real robots. Combining reinforcement learning with pre-collected demonstrations is a promising approach that can help in learning control policies to solve robotic tasks. In this domain, we propose an algorithm that uses novel techniques to leverage the offline expert data using offline and online training to speed up the policy convergence and improve its performance. The proposed algorithm (AWET) weights the critic losses with a novel agent advantage weight to improve over the expert data. Also, AWET uses an automatic early termination technique to stop and discard any policy rollout that is not similar to expert trajectories to prevent drifting far from the expert data. AWET showed competitive results when compared to state-of-the-art baselines. Moreover, we do an ablation experiment on the different AWET components.
 </p>
 
 <h3 style="clear:both">Research Method</h3>
 <p style="padding-left: 10px; padding-right: 10px;">
-  Reward functions in robot learning play a major role in measuring task success in order to numerically reward the behaviour of robots. The use of onboard robot sensors only---without relying on any other external sensors---makes the problem of measuring the success of tasks even harder. In this context, this paper focuses on training success classifiers (also referred to as 'goal classifiers') for measuring the levels of success in robotic manipulation tasks from only a few (as opposed to many) human demonstrations. 
-  The idea of training a success classifier in a new task using only a few demonstrations with high accuracy is still a challenging research problem. In this work, we study such a problem via the scenario illustrated in figure below.
-</p>
-  
-<p>
-  <center>
-    <img src="img/overview.jpg" height="280px" />
-  </center>
+  More is coming soon!!!
 </p>
   
 
-<h3 style="clear:both">Model</h3>
-<p style="padding-left: 10px; padding-right: 10px;">
-  CNN-based neural architectures for task success classification
-</p>
-  
-<p>
-  <center>
-    <img src="img/big_model.jpg" height="500px" />
-  </center>
-</p>
 
-<h3 style="clear:both">Results</h3>
-<p style="padding-left: 10px; padding-right: 10px;">
-  Average performance results of our baseline and proposed neural architectures for task success classification applied to the Kitchen and MIME datasets (notation: ACC=Average Classification Accuracy, AUC=Area Under the Curve)
-</p>
-  
-<p>
-  <center>
-    <img src="img/table.png" height="160px" />
-  </center>
-</p>
-
-<h3 style="clear:both">Paper</h3>
-<p style="padding-left: 10px; padding-right: 10px;">
-  Preprint can be accessed on <a href="http://mohtasib.github.io/">arXiv</a>.
-</p>
-
-<h3 style="clear:both">Code</h3>
-<p style="padding-left: 10px; padding-right: 10px;">
-  The code is available at <a href="https://github.com/Mohtasib/RewardLearning">github.com/Mohtasib/RewardLearning</a>.
-</p>
-
-<h3 style="clear:both">Data</h3>
-<p style="padding-left: 10px; padding-right: 10px;">
-  The data is available at <a href="https://github.com/Mohtasib/RewardLearning">github.com/Mohtasib/RewardLearning</a>.
-</p>
-
-<h3 style="clear:both">Citation</h3>
-<p style="padding-left: 10px; padding-right: 10px;">
-  To be added later!
-<!-- <code>
-  @inproceedings{nair19ccrig, <br />
-&nbsp;&nbsp;&nbsp;&nbsp;author&nbsp;&nbsp;&nbsp;&nbsp;= {A. Nair and S. Bahl and A. Khazatsky and V. Pong and G. Berseth and S. Levine}, <br />
-&nbsp;&nbsp;&nbsp;&nbsp;title&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= {Contextual Imagined Goals for Self-Supervised Robotic Learning}, <br />
-&nbsp;&nbsp;&nbsp;&nbsp;booktitle&nbsp;= {Conference on Robot Learning (CoRL)}, <br />
-&nbsp;&nbsp;&nbsp;&nbsp;year&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= {2019} <br />
-  }
-</code> -->
-</p>
 
 <script src="js/script-min.js"></script>
 
