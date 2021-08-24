@@ -1,0 +1,166 @@
+/********************
+CSS template for my academic/project webpages.
+Feel free to use/edit.
+Credits appreciated.
+
+(C) Abhinav Shrivastava, 2011
+http://www.abhinav-shrivastava.info
+********************/
+
+body {
+  background-color: white;
+  color: black;
+  text-align:center;
+}
+
+
+#primarycontent a:link {
+    color: #009;
+    text-decoration: none;
+}
+
+#primarycontent a:visited {
+    color: #00F;
+    text-decoration: none;
+    /*color: #8d9345; */
+}
+
+#primarycontent a:hover {
+    text-decoration: underline;
+}
+
+#people {
+	list-style-type: none;
+	margin-left: 0px;
+	padding-left: 10px;
+}
+
+#primarycontent {
+  max-width: 800px;
+  width: expression(document.body.clientWidth > 800? "800px": "auto" );
+  text-align: left;
+  margin-left: auto;
+  margin-right: auto;
+  color: black;
+  font-family: Arial, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 0.9em;
+}
+
+p.footer {
+    font-size: x-small;
+}
+
+#primarycontent h3{
+	border-bottom: 1px solid darkgray;
+	text-align: left;
+    padding: 0 0 0.2em 0.5em;
+    margin: 2em 0 0 0;
+}
+
+.toggle{
+	line-height:1.5em;
+	background: #EAEAEA;
+    border-bottom:1px solid #000;
+	border-top:1px solid #000;
+	cursor:pointer;
+	font-size: 11pt;
+	padding-left:0.8em;
+	font-variant:small-caps;
+}
+
+.toggle:hover{
+	background: #C8DFE1;
+	text-decoration:none;
+}
+
+.toggle a {
+	text-decoration:none;
+	color: black;
+}
+.hiddenDiv{
+	display:none;
+}
+
+.datatable {
+  border-collapse: collapse;
+  text-align: left;
+  padding: 8px;
+}
+
+.datatable tr:nth-child(even){background-color: #f2f2f2;}
+
+.column {
+  float: left;
+  width: 50%;
+  /*padding: 10px;*/
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+figure {
+  width: 33.33333333%;
+  margin: 0;
+  float: left;
+  padding: 10px;
+  position: relative;
+  cursor: pointer;
+}
+figure:before,
+figure:after {
+  position: absolute;
+}
+figure:before {
+  top: 35%;
+  left: 40%;
+  margin-left: 100px;
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255, 255, 255, 0.7);
+  border-radius: 25px;
+  background-color: rgba(204, 209, 217, 0.3);
+  font-family: 'Ionicons';
+  content: '\f215';
+  text-align: center;
+  line-height: 45px;
+  font-size: 19px;
+  color: #F5F7FA;
+}
+/*figure:after {
+  content: 'gif';
+  position: absolute;
+  display: inline-block;
+  width: 40px;
+  text-align: center;
+  top: 20px;
+  right: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px;
+  border-radius: 3px;
+  color: #656D78;
+  background-color: rgba(170, 178, 189, 0.1);
+  text-transform: uppercase;
+}*/
+figure.play:before {
+  display: none;
+}
+figure.play:after {
+  color: #fff;
+  background-color: #8CC152;
+}
+figcaption {
+  padding-top: 15px;
+  font-size: 14px;
+  color: #8d9bad;
+}
+figcaption a {
+  color: #59687b;
+  text-decoration: none;
+}
