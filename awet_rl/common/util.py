@@ -112,15 +112,3 @@ def calculate_similarity_threshold(trajectories, sim_test_point):
     sim = np.array(sim)
     sim_thr = 2 * np.sum(sim) / ((M*M) - M)
     return sim_thr
-
-# data = calculate_q_values(load_data('Demos_data/Pendulum_Demos.pkl'))
-# transitions = create_transitions(data)
-
-# print(len(data))
-# print(len(transitions))
-
-
-# trajectories = create_trajectories(load_data('/home/abdalkarim/MyProjects/test_myrl/Demos_data/Pendulum_Dense_Demos_100.pkl'))
-# sim = calculate_trajectory_similarity(trajectories[1][:25], trajectories[:,:25,:])
-# print(trajectories.shape)
-# print(sim)

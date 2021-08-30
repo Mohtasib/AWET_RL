@@ -20,8 +20,8 @@ from stable_baselines3.common.type_aliases import GymEnv, MaybeCallback, Rollout
 from stable_baselines3.common.utils import safe_mean, should_collect_more_steps, update_learning_rate
 from stable_baselines3.common.vec_env import VecEnv
 
-from my_rl.common.util import *
-from my_rl.common.buffers import ExtendedReplayBuffer
+from awet_rl.common.util import *
+from awet_rl.common.buffers import ExtendedReplayBuffer
 
 class OffPolicyAlgorithm(BaseAlgorithm):
     """
@@ -288,8 +288,7 @@ class OffPolicyAlgorithm(BaseAlgorithm):
         self.expert_trajectories = create_trajectories(expert_data)
 
         # Calculate the expert trajectories similarity threshold:
-        # self.similarity_test_point = self.env._max_episode_steps/2  #TODO: find how to do this
-        self.similarity_test_point = 25
+        self.similarity_test_point = int(self.env.unwrapped.envs[0].spec.max_episode_steps/2.0)
         self.similarity_threshold = calculate_similarity_threshold(self.expert_trajectories, self.similarity_test_point)
         # print('self.similarity_threshold = ', self.similarity_threshold)
 
@@ -779,8 +778,6 @@ class OffPolicyAlgorithm(BaseAlgorithm):
                 if episode_timesteps == sim_test_point:
                     trajectory_sim = calculate_trajectory_similarity(np.vstack(trajectory), self.expert_trajectories, sim_test_point)
                     sim = trajectory_sim
-                    # sim = min(trajectory_sim)
-                    # print('sim = ', sim)
 
                     if sim > sim_threshold and num_collected_steps >= learning_starts:
                         done = True

@@ -16,7 +16,7 @@ from stable_baselines3.common.preprocessing import get_action_dim, get_obs_shape
 from stable_baselines3.common.type_aliases import ReplayBufferSamples, RolloutBufferSamples
 from stable_baselines3.common.vec_env import VecNormalize
 
-from my_rl.common.type_aliases import ExtendedReplayBufferSamples
+from awet_rl.common.type_aliases import ExtendedReplayBufferSamples
 
 class BaseBuffer(ABC):
     """

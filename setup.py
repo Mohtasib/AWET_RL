@@ -7,7 +7,7 @@ def read_requirements_file(filename):
         return [line.strip() for line in f]
 
 setup(name='awet_rl',
-      version='0.1.0',
+      version='1.0.0',
       description="This is the implementation of AWET algorithm for DDPG, TD3, and SAC and it is based on the stable_baselines3",
       author="Abdalkarim Mohtasib",
       author_email='amohtasib@lincoln.ac.uk',

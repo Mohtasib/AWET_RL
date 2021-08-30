@@ -17,12 +17,12 @@ from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.type_aliases import RolloutReturn, TrainFreq
 from stable_baselines3.common.utils import should_collect_more_steps
 
-from my_rl.common.off_policy_algorithm import OffPolicyAlgorithm
-from my_rl.common.buffers import ExtendedReplayBuffer
+from awet_rl.common.off_policy_algorithm import OffPolicyAlgorithm
+from awet_rl.common.buffers import ExtendedReplayBuffer
 
-class TD3(OffPolicyAlgorithm):
+class AWET_TD3(OffPolicyAlgorithm):
     """
-    Twin Delayed DDPG (TD3)
+    Twin Delayed DDPG (TD3) with AWET Algorithm
     Addressing Function Approximation Error in Actor-Critic Methods.
 
     Original implementation: https://github.com/sfujim/TD3
@@ -90,7 +90,7 @@ class TD3(OffPolicyAlgorithm):
         _init_setup_model: bool = True,
     ):
 
-        super(TD3, self).__init__(
+        super(AWET_TD3, self).__init__(
             policy,
             env,
             TD3Policy,
@@ -122,7 +122,7 @@ class TD3(OffPolicyAlgorithm):
             self._setup_model()
 
     def _setup_model(self) -> None:
-        super(TD3, self)._setup_model()
+        super(AWET_TD3, self)._setup_model()
         self._create_aliases()
 
     def _create_aliases(self) -> None:
@@ -319,7 +319,7 @@ class TD3(OffPolicyAlgorithm):
         ET_mode: bool = False,
     ) -> OffPolicyAlgorithm:
 
-        return super(TD3, self).learn(
+        return super(AWET_TD3, self).learn(
             total_timesteps=total_timesteps,
             callback=callback,
             log_interval=log_interval,
@@ -342,7 +342,7 @@ class TD3(OffPolicyAlgorithm):
         )
 
     def _excluded_save_params(self) -> List[str]:
-        return super(TD3, self)._excluded_save_params() + ["actor", "critic", "actor_target", "critic_target"]
+        return super(AWET_TD3, self)._excluded_save_params() + ["actor", "critic", "actor_target", "critic_target"]
 
     def _get_torch_save_params(self) -> Tuple[List[str], List[str]]:
         state_dicts = ["policy", "actor.optimizer", "critic.optimizer"]

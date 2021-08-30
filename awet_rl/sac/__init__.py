@@ -1,1 +1,1 @@
-from my_rl.sac.sac import SAC
+from awet_rl.sac.sac import AWET_SAC

@@ -1,8 +1,8 @@
 import os
 
-from my_rl.ddpg import DDPG
-from my_rl.td3 import TD3
-from my_rl.sac import SAC
+from awet_rl.ddpg import AWET_DDPG
+from awet_rl.td3 import AWET_TD3
+from awet_rl.sac import AWET_SAC
 
 # Read version from file
 version_file = os.path.join(os.path.dirname(__file__), "version.txt")

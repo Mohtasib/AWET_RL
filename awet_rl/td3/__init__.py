@@ -1,2 +1,2 @@
 
-from my_rl.td3.td3 import TD3
+from awet_rl.td3.td3 import AWET_TD3

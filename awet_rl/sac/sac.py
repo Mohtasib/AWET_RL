@@ -11,12 +11,12 @@ from stable_baselines3.common.type_aliases import GymEnv, MaybeCallback, Schedul
 from stable_baselines3.common.utils import polyak_update, update_learning_rate
 from stable_baselines3.sac.policies import SACPolicy
 
-from my_rl.common.off_policy_algorithm import OffPolicyAlgorithm
-from my_rl.common.buffers import ExtendedReplayBuffer
+from awet_rl.common.off_policy_algorithm import OffPolicyAlgorithm
+from awet_rl.common.buffers import ExtendedReplayBuffer
 
-class SAC(OffPolicyAlgorithm):
+class AWET_SAC(OffPolicyAlgorithm):
     """
-    Soft Actor-Critic (SAC)
+    Soft Actor-Critic (SAC) with AWET Algorithm
     Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor,
     This implementation borrows code from original implementation (https://github.com/haarnoja/sac)
     from OpenAI Spinning Up (https://github.com/openai/spinningup), from the softlearning repo
@@ -99,7 +99,7 @@ class SAC(OffPolicyAlgorithm):
         _init_setup_model: bool = True,
     ):
 
-        super(SAC, self).__init__(
+        super(AWET_SAC, self).__init__(
             policy,
             env,
             SACPolicy,
@@ -137,7 +137,7 @@ class SAC(OffPolicyAlgorithm):
             self._setup_model()
 
     def _setup_model(self) -> None:
-        super(SAC, self)._setup_model()
+        super(AWET_SAC, self)._setup_model()
         self._create_aliases()
         # Target entropy is used when learning the entropy coefficient
         if self.target_entropy == "auto":
@@ -240,90 +240,6 @@ class SAC(OffPolicyAlgorithm):
             actor_loss.backward()
             self.actor.optimizer.step()
             # self.actor.optimizer.weight_decay=0.00
-
-    def pre_train_actor_temp(
-        self,
-        replay_buffer: ExtendedReplayBuffer,
-        gradient_steps: int = 1000,
-        batch_size: int = 100,
-        actor_lr: float = 1e-3,
-        C_l: float = 0.5,
-        L_2: float = 0.01,
-        ):
-
-        # Set learning rates:
-        update_learning_rate(self.actor.optimizer, actor_lr)
-        if self.ent_coef_optimizer is not None:
-            update_learning_rate(self.ent_coef_optimizer, actor_lr)
-
-        mse_loss = th.nn.MSELoss()
-
-        for gradient_step in range(gradient_steps):
-
-            # Sample replay buffer
-            replay_data = replay_buffer.sample(batch_size, env=self._vec_normalize_env)
-            
-            # Get target actions from the expert data
-            target_actions = replay_data.actions
-            
-            # We need to sample because `log_std` may have changed between two gradient steps
-            if self.use_sde:
-                self.actor.reset_noise()
-
-            # Action by the current actor for the sampled state
-            current_actions, log_prob = self.actor.action_log_prob(replay_data.observations)
-            log_prob = log_prob.reshape(-1, 1)
-
-            # Compute actor loss
-            # Alternative: actor_loss = th.mean(log_prob - qf1_pi)
-            # Mean over all critic networks
-            q_values_pi = th.cat(self.critic.forward(replay_data.observations, current_actions), dim=1)
-            min_qf_pi, _ = th.min(q_values_pi, dim=1, keepdim=True)
-            # actor_log_loss = (ent_coef * log_prob - min_qf_pi).mean()
-            actor_log_loss = (log_prob - min_qf_pi).mean()
-            actor_bc_loss = mse_loss(current_actions, target_actions)
-
-            actor_loss = (actor_log_loss*float(1e-3)) + (actor_bc_loss/float(batch_size))
-
-            # Optimize the actor
-            # self.actor.optimizer.weight_decay=L_2
-            self.actor.optimizer.zero_grad()
-            actor_loss.backward()
-            self.actor.optimizer.step()
-            # self.actor.optimizer.weight_decay=0.00
-
-        for gradient_step in range(gradient_steps):
-
-            # Sample replay buffer
-            replay_data = replay_buffer.sample(batch_size, env=self._vec_normalize_env)
-            
-            # Get target actions from the expert data
-            target_actions = replay_data.actions
-            
-            # We need to sample because `log_std` may have changed between two gradient steps
-            if self.use_sde:
-                self.actor.reset_noise()
-
-            # Action by the current actor for the sampled state
-            current_actions, log_prob = self.actor.action_log_prob(replay_data.observations)
-            log_prob = log_prob.reshape(-1, 1)
-
-            ent_coef_loss = None
-            if self.ent_coef_optimizer is not None:
-                # Important: detach the variable from the graph
-                # so we don't change it with other losses
-                # see https://github.com/rail-berkeley/softlearning/issues/60
-                ent_coef = th.exp(self.log_ent_coef.detach())
-                ent_coef_loss = -(self.log_ent_coef * (log_prob + self.target_entropy).detach()).mean()
-            else:
-                ent_coef = self.ent_coef_tensor
-
-            # Optimize entropy coefficient, also called
-            # entropy temperature or alpha in the paper
-            if ent_coef_loss is not None:
-                self.ent_coef_optimizer.zero_grad()
-                ent_coef_loss.backward()
-                self.ent_coef_optimizer.step()
 
     def train(
         self, 
@@ -512,100 +428,6 @@ class SAC(OffPolicyAlgorithm):
         if len(ent_coef_losses) > 0:
             logger.record("train/ent_coef_loss", np.mean(ent_coef_losses))
 
-    def train_old(self, gradient_steps: int, batch_size: int = 64) -> None:
-        # Update optimizers learning rate
-        optimizers = [self.actor.optimizer, self.critic.optimizer]
-        if self.ent_coef_optimizer is not None:
-            optimizers += [self.ent_coef_optimizer]
-
-        # Update learning rate according to lr schedule
-        self._update_learning_rate(optimizers)
-
-        ent_coef_losses, ent_coefs = [], []
-        actor_losses, critic_losses = [], []
-
-        for gradient_step in range(gradient_steps):
-            # Sample replay buffer
-            replay_data = self.replay_buffer.sample(batch_size, env=self._vec_normalize_env)
-
-            # We need to sample because `log_std` may have changed between two gradient steps
-            if self.use_sde:
-                self.actor.reset_noise()
-
-            # Action by the current actor for the sampled state
-            actions_pi, log_prob = self.actor.action_log_prob(replay_data.observations)
-            log_prob = log_prob.reshape(-1, 1)
-
-            ent_coef_loss = None
-            if self.ent_coef_optimizer is not None:
-                # Important: detach the variable from the graph
-                # so we don't change it with other losses
-                # see https://github.com/rail-berkeley/softlearning/issues/60
-                ent_coef = th.exp(self.log_ent_coef.detach())
-                ent_coef_loss = -(self.log_ent_coef * (log_prob + self.target_entropy).detach()).mean()
-                ent_coef_losses.append(ent_coef_loss.item())
-            else:
-                ent_coef = self.ent_coef_tensor
-
-            ent_coefs.append(ent_coef.item())
-
-            # Optimize entropy coefficient, also called
-            # entropy temperature or alpha in the paper
-            if ent_coef_loss is not None:
-                self.ent_coef_optimizer.zero_grad()
-                ent_coef_loss.backward()
-                self.ent_coef_optimizer.step()
-
-            with th.no_grad():
-                # Select action according to policy
-                next_actions, next_log_prob = self.actor.action_log_prob(replay_data.next_observations)
-                # Compute the next Q values: min over all critics targets
-                next_q_values = th.cat(self.critic_target(replay_data.next_observations, next_actions), dim=1)
-                next_q_values, _ = th.min(next_q_values, dim=1, keepdim=True)
-                # add entropy term
-                next_q_values = next_q_values - ent_coef * next_log_prob.reshape(-1, 1)
-                # td error + entropy term
-                target_q_values = replay_data.rewards + (1 - replay_data.dones) * self.gamma * next_q_values
-
-            # Get current Q-values estimates for each critic network
-            # using action from the replay buffer
-            current_q_values = self.critic(replay_data.observations, replay_data.actions)
-
-            # Compute critic loss
-            critic_loss = 0.5 * sum([F.mse_loss(current_q, target_q_values) for current_q in current_q_values])
-            critic_losses.append(critic_loss.item())
-
-            # Optimize the critic
-            self.critic.optimizer.zero_grad()
-            critic_loss.backward()
-            self.critic.optimizer.step()
-
-            # Compute actor loss
-            # Alternative: actor_loss = th.mean(log_prob - qf1_pi)
-            # Mean over all critic networks
-            q_values_pi = th.cat(self.critic.forward(replay_data.observations, actions_pi), dim=1)
-            min_qf_pi, _ = th.min(q_values_pi, dim=1, keepdim=True)
-            actor_loss = (ent_coef * log_prob - min_qf_pi).mean()
-            actor_losses.append(actor_loss.item())
-
-            # Optimize the actor
-            self.actor.optimizer.zero_grad()
-            actor_loss.backward()
-            self.actor.optimizer.step()
-
-            # Update target networks
-            if gradient_step % self.target_update_interval == 0:
-                polyak_update(self.critic.parameters(), self.critic_target.parameters(), self.tau)
-
-        self._n_updates += gradient_steps
-
-        logger.record("train/n_updates", self._n_updates, exclude="tensorboard")
-        logger.record("train/ent_coef", np.mean(ent_coefs))
-        logger.record("train/actor_loss", np.mean(actor_losses))
-        logger.record("train/critic_loss", np.mean(critic_losses))
-        if len(ent_coef_losses) > 0:
-            logger.record("train/ent_coef_loss", np.mean(ent_coef_losses))
-
     def learn(
         self,
         total_timesteps: int,
@@ -629,7 +451,7 @@ class SAC(OffPolicyAlgorithm):
         ET_mode: bool = False,
     ) -> OffPolicyAlgorithm:
 
-        return super(SAC, self).learn(
+        return super(AWET_SAC, self).learn(
             total_timesteps=total_timesteps,
             callback=callback,
             log_interval=log_interval,
@@ -652,7 +474,7 @@ class SAC(OffPolicyAlgorithm):
         )
 
     def _excluded_save_params(self) -> List[str]:
-        return super(SAC, self)._excluded_save_params() + ["actor", "critic", "critic_target"]
+        return super(AWET_SAC, self)._excluded_save_params() + ["actor", "critic", "critic_target"]
 
     def _get_torch_save_params(self) -> Tuple[List[str], List[str]]:
         state_dicts = ["policy", "actor.optimizer", "critic.optimizer"]

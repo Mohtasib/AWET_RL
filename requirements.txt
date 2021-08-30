@@ -1,7 +1,10 @@
-gym>=0.17
-numpy
-torch>=1.4.0
-cloudpickle
-pandas
-matplotlib
+gym==0.13.0
+numpy==1.19.5
+tqdm==4.60.0
+torch==1.8.0
+cloudpickle==1.6.0
+pandas==1.1.5
+matplotlib==3.3.3
+seaborn==0.11.1
 stable_baselines3==1.0
+tslearn==0.5.1.0

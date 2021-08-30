@@ -6,12 +6,12 @@ from stable_baselines3.common.noise import ActionNoise
 from stable_baselines3.common.off_policy_algorithm import OffPolicyAlgorithm
 from stable_baselines3.common.type_aliases import GymEnv, MaybeCallback, Schedule
 from stable_baselines3.td3.policies import TD3Policy
-from my_rl.td3.td3 import TD3
+from awet_rl.td3.td3 import AWET_TD3
 
 
-class DDPG(TD3):
+class AWET_DDPG(AWET_TD3):
     """
-    Deep Deterministic Policy Gradient (DDPG).
+    Deep Deterministic Policy Gradient (DDPG) with AWET Algorithm
 
     Deterministic Policy Gradient: http://proceedings.mlr.press/v32/silver14.pdf
     DDPG Paper: https://arxiv.org/abs/1509.02971
@@ -72,7 +72,7 @@ class DDPG(TD3):
         _init_setup_model: bool = True,
     ):
 
-        super(DDPG, self).__init__(
+        super(AWET_DDPG, self).__init__(
             policy=policy,
             env=env,
             learning_rate=learning_rate,
@@ -130,7 +130,7 @@ class DDPG(TD3):
 
     ) -> OffPolicyAlgorithm:
 
-        return super(DDPG, self).learn(
+        return super(AWET_DDPG, self).learn(
             total_timesteps=total_timesteps,
             callback=callback,
             log_interval=log_interval,
