@@ -1,0 +1,7 @@
+gym>=0.17
+numpy
+torch>=1.4.0
+cloudpickle
+pandas
+matplotlib
+stable_baselines3==1.0
