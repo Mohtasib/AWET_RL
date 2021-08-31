@@ -1,4 +1,5 @@
 import os
+import yaml
 import argparse
 import gym
 import custom_gym
@@ -7,7 +8,7 @@ import matplotlib.pyplot as plt
 
 from stable_baselines3.common.monitor import Monitor
 
-from awet_rl.common.util import SaveOnBestTrainingRewardCallback, save_pickle_obj
+from awet_rl.common.util import SaveOnBestTrainingRewardCallback
 
 def Trainer(params):
     print('=========== Training Started !!!')
@@ -15,10 +16,11 @@ def Trainer(params):
     print(params)
 
     save_dir = f"experiments/{params['general_params']['env_name']}/{params['general_params']['exp_name']}/{params['general_params']['agent']}"
-    os.makedirs(log_dir, exist_ok=True)
+    os.makedirs(save_dir, exist_ok=True)
 
     # Save training parameters:
-    save_pickle_obj(params, f'{save_dir}/params')
+    with open(f'{save_dir}/params.yml', 'w') as outfile:
+        yaml.dump(params, outfile, default_flow_style=False)
     print('=========== Training parameters saved !!!')
     
     for i in range(params['general_params']['num_runs']):
@@ -88,7 +90,7 @@ def Trainer(params):
         callback = SaveOnBestTrainingRewardCallback(check_freq=1000, log_dir=log_dir)
         # Train the agent
         model.learn(total_timesteps=int(timesteps), 
-                    expert_data_path=expert_data_path, 
+                    expert_data_path=params['general_params']['expert_data_path'], 
                     gradient_steps=params['awet_params']['gradient_steps'], 
                     C_e=params['awet_params']['C_e'],
                     C_l=params['awet_params']['C_l'],
@@ -103,11 +105,11 @@ def Trainer(params):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run an experiment using AWET algorithm')
-    parser.add_argument('--params_path', type=str,   default='../configs/pusher/awet_td3.yml', help='parameters directory for training')
+    parser.add_argument('--params_path', type=str,   default='configs/pusher/awet_td3.yml', help='parameters directory for training')
     args = parser.parse_args()
 
     # load paramaters:
     with open(args.params_path) as f:
-        params = yaml.load(f, Loader=yaml.BaseLoader)  # params is dict
+        params = yaml.safe_load(f)  # params is dict
 
     Trainer(params)
