@@ -1,0 +1,38 @@
+algo_params:
+  buffer_size: 200000
+  gamma: 0.98
+  gradient_steps: -1
+  learning_rate: 0.001
+  learning_starts: 0
+  n_critics: 2
+  net_arch:
+  - 400
+  - 300
+  sigma: 0.05
+awet_params:
+  AA_mode: false
+  C_clip: 1.6
+  C_e: 0.6
+  C_l: 0.8
+  ET_mode: true
+  L_2: 0.005
+  gradient_steps: 1000
+  num_demos: 100
+general_params:
+  agent: AWET_TD3_no_AA
+  env_name: CustomPusherDense-v1
+  exp_name: ET_Exp
+  expert_data_path: demos_data/pusher/Pusher_Dense_Demos_100.pkl
+  num_episodes: 2000
+  num_runs: 10
+plotter_params:
+  dpi: 70
+  font_scale: 2.5
+  height: 8
+  linewidth: 3.5
+  max_num_episodes: 2000
+  smooth_window: 200
+  width: 10
+tester_params:
+  num_episodes: 100
+  render: false
