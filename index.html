@@ -80,7 +80,7 @@
 </head>
 <body>
 <div id="primarycontent">
-<h1 align="center" itemprop="name">AWET: Robot Policy Learning from Demonstration with Advantage Weighting and Early Termination</h1>
+<h1 align="center" itemprop="name">Robot Policy Learning from Demonstration with Advantage Weighting and Early Termination</h1>
 
 <center>
 <ul id="people" itemprop="accountablePerson">
@@ -101,7 +101,7 @@
 
 <h3 style="clear:both">Abstract</h3>
 <p style="padding-left: 10px; padding-right: 10px;">
-  Learning robotic tasks in the real world is still challenging and has not been fully solved. The traditional methods used in this domain are imitation learning and reinforcement learning. However, they both have limitations when applied to real robots. Combining reinforcement learning with pre-collected demonstrations is a promising approach that can help in learning control policies to solve robotic tasks. In this domain, we propose an algorithm that uses novel techniques to leverage the offline expert data using offline and online training to speed up the policy convergence and improve its performance. The proposed algorithm (AWET) weights the critic losses with a novel agent advantage weight to improve over the expert data. Also, AWET uses an automatic early termination technique to stop and discard any policy rollout that is not similar to expert trajectories to prevent drifting far from the expert data. AWET showed competitive results when compared to state-of-the-art baselines. Moreover, we do an ablation experiment on the different AWET components.
+  Learning robotic tasks in the real world is still highly challenging and effective practical solutions remain to be found. Traditional methods used in this area are imitation learning and reinforcement learning, but they both have limitations when applied to real robots. Combining reinforcement learning with pre-collected demonstrations is a promising approach that can help in learning control policies to solve robotic tasks. In this paper, we propose an algorithm that uses novel techniques to leverage offline expert data using offline and online training to speed up  policy convergence and improved performance. The proposed algorithm (AWET) weights the critic losses with a novel agent advantage weight to improve over the expert data. In addition, AWET makes use of an automatic early termination technique to stop and discard policy rollouts that are not similar to expert trajectories---to prevent drifting far from the expert data. In an ablation study, AWET showed improved and promising performance when compared to state-of-the-art baselines on four standard robotic tasks.
 </p>
 
 <h3 style="clear:both">Research Method</h3>
