@@ -13,7 +13,8 @@ from awet_rl.common.util import SaveOnBestTrainingRewardCallback
 def Trainer(params):
     print('=========== Training Started !!!')
     print('=========== Training parameters:')
-    print(params)
+    import pprint
+    pprint.pprint(params)
 
     save_dir = f"experiments/{params['general_params']['env_name']}/{params['general_params']['exp_name']}/{params['general_params']['agent']}"
     os.makedirs(save_dir, exist_ok=True)
