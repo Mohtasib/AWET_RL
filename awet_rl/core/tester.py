@@ -91,10 +91,12 @@ def test_envs(env, model, num_episodes=100, render=False):
     return response, reward, success, eps_len, test_time
 
 def Test(env_name, exp_path, model_name, num_episodes=100, render=False):
-    results = []
     path = f'{exp_path}/{model_name}/'
     seeds = listdirs(path)
     seeds.sort()
+
+    results_df = pd.DataFrame(columns = ['env_name', 'model_name', 'seed', 'res_mean', 'res_std', 'rew_avg', 'success_rate', 'test_time', 'eps_len'])
+
     for seed in seeds:
         env = gym.make(env_name)
         if model_name.startswith("AWET_DDPG"): 
@@ -111,22 +113,22 @@ def Test(env_name, exp_path, model_name, num_episodes=100, render=False):
         else:
             response, reward, success, eps_len, test_time = test_envs(env, model, num_episodes, render)
         
-        results.append([env_name, model_name, seed, round(response.mean(),4), round(response.std(),4), round(reward.mean(),4), round(success.mean(),4), test_time, round(eps_len.mean(),4)])
+        results = [env_name, model_name, seed, round(response.mean(),4), round(response.std(),4), round(reward.mean(),4), round(success.mean(),4), test_time, round(eps_len.mean(),4)]
         print(f'{env_name}, {model_name}, {seed}:')
-        print(f'res_mean = {round(response.mean(),4)}, res_std = {round(response.std(),4)}, rew_avg = {round(reward.mean(),4)}, success_rate = {round(success.mean(),4)}, test_time = {test_time}, eps_len = {round(eps_len.mean(),4)}')
+        print(f'res_mean = {results[3]}, res_std = {results[4]}, rew_avg = {results[5]}, success_rate = {results[6]}, test_time = {results[7]}, eps_len = {results[8]}')
+        results_df = results_df.append({'env_name': results[0],
+                                        'model_name': results[1],
+                                        'seed': results[2],
+                                        'res_mean': results[3],
+                                        'res_std': results[4],
+                                        'rew_avg': results[5],
+                                        'success_rate': results[6],
+                                        'test_time': results[7],
+                                        'eps_len': results[8],
+                                        },
+                                        ignore_index = True)
 
-    results = np.vstack(results)
-    results_dict = {'env_name': results[:,0],
-                    'model_name': results[:,1],
-                    'seed': results[:,2],
-                    'res_mean': results[:,3],
-                    'res_std': results[:,4],
-                    'rew_avg': results[:,5],
-                    'success_rate': results[:,6],
-                    'test_time': results[:,7],
-                    'eps_len': results[:,8],
-                    }
-    return results_dict
+    return results_df
 
 def Tester(params):
     print('=========== Testing Started !!!')

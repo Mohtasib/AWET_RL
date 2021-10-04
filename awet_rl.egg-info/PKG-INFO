@@ -1,0 +1,11 @@
+Metadata-Version: 1.2
+Name: awet-rl
+Version: 1.0.0
+Summary: This is the implementation of AWET algorithm for DDPG, TD3, and SAC and it is based on the stable_baselines3
+Home-page: https://github.com/Mohtasib/AWET_RL
+Author: Abdalkarim Mohtasib
+Author-email: amohtasib@lincoln.ac.uk
+License: GPLv3
+Description: UNKNOWN
+Platform: any
+Requires-Python: >=3.6
