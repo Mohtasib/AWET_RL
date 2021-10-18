@@ -192,6 +192,8 @@ class AWET_TD3(OffPolicyAlgorithm):
         self._update_learning_rate([self.actor.optimizer, self.critic.optimizer])
 
         actor_losses, critic_losses = [], []
+        agent_critic_losses, expert_critic_losses, agent_actor_losses, expert_actor_losses = [], [], [], []
+        q_as, q_es, agent_advantages = [], [], []
 
         mse_loss = th.nn.MSELoss()
 
@@ -238,13 +240,19 @@ class AWET_TD3(OffPolicyAlgorithm):
 
             if AA_mode:
                 # Calculate the agent advantage based on the q_values:
-                q_a = min([th.mean(q_values) for q_values in agent_current_q_values])
-                q_e = min([th.mean(q_values) for q_values in expert_current_q_values])
+                q_a = min([th.mean(q_values) for q_values in agent_current_q_values]).detach().cpu().numpy()
+                q_e = min([th.mean(q_values) for q_values in expert_current_q_values]).detach().cpu().numpy()
                 agent_advantage = q_a / (q_a + q_e)
                 critic_loss = (agent_critic_loss * agent_advantage * (1.0-C_e)) + (expert_critic_loss * (1.0 - agent_advantage) * C_e)
             else:
                 critic_loss = (agent_critic_loss * (1.0-C_e)) + (expert_critic_loss * C_e)
             
+            q_as.append(q_a)
+            q_es.append(q_e)
+            agent_advantages.append(agent_advantage)
+
+            agent_critic_losses.append(agent_critic_loss.item())
+            expert_critic_losses.append(expert_critic_loss.item())
             critic_losses.append(critic_loss.item())
 
             # Optimize the critics
@@ -279,6 +287,9 @@ class AWET_TD3(OffPolicyAlgorithm):
                     expert_actor_loss = 0.0
 
                 actor_loss = ((agent_actor_loss * float(1e-3) * (1.0-C_e)) + (expert_actor_loss * C_e))
+                
+                agent_actor_losses.append(agent_actor_loss.item())
+                expert_actor_losses.append(expert_actor_loss.item())
                 actor_losses.append(actor_loss.item())
 
                 # Optimize the actor
@@ -293,8 +304,16 @@ class AWET_TD3(OffPolicyAlgorithm):
 
         logger.record("train/n_updates", self._n_updates, exclude="tensorboard")
         if len(actor_losses) > 0:
-            logger.record("train/actor_loss", np.mean(actor_losses))
-        logger.record("train/critic_loss", np.mean(critic_losses))
+            logger.record("actor_loss/actor_loss", np.mean(actor_losses))
+        logger.record("critic_loss/critic_loss", np.mean(critic_losses))
+
+        logger.record("critic_loss/agent_critic_loss", np.mean(agent_critic_losses))
+        logger.record("critic_loss/expert_critic_loss", np.mean(expert_critic_losses))
+        logger.record("actor_loss/agent_actor_loss", np.mean(agent_actor_losses))
+        logger.record("actor_loss/expert_actor_loss", np.mean(expert_actor_losses))
+        logger.record("agent_advantage/q_a", np.mean(q_as))
+        logger.record("agent_advantage/q_e", np.mean(q_es))
+        logger.record("agent_advantage/agent_advantage", np.mean(agent_advantages))
 
     def learn(
         self,

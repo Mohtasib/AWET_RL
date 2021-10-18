@@ -1,17 +1,18 @@
 import os
 import yaml
 import argparse
-import math
 import numpy as np
 import pandas as pd
 import gym
 import custom_gym
 import time
 
+from stable_baselines3 import DDPG, TD3, SAC
 from awet_rl import AWET_DDPG, AWET_TD3, AWET_SAC
 from awet_rl.common.util import listdirs
 
 def test_pendulum(env, model, num_episodes=100, render=False):
+    import math
     response = []  
     reward = [] 
     success = []
@@ -73,6 +74,7 @@ def test_envs(env, model, num_episodes=100, render=False):
                     eps_len.append(i+1)
                     succeeded = True
             else:
+                new_r = -env.state
                 state = -new_r
                 if state <= env.distance_threshold: 
                     eps_len.append(i+1)
@@ -99,16 +101,22 @@ def Test(env_name, exp_path, model_name, num_episodes=100, render=False):
 
     for seed in seeds:
         env = gym.make(env_name)
-        if model_name.startswith("AWET_DDPG"): 
+        if model_name.startswith("DDPG"): 
+            model = DDPG.load(f'{exp_path}/{model_name}/{seed}/best_model.zip', env=env)
+        elif model_name.startswith("TD3"): 
+            model = TD3.load(f'{exp_path}/{model_name}/{seed}/best_model.zip', env=env)
+        elif model_name.startswith("SAC"):  
+            model = SAC.load(f'{exp_path}/{model_name}/{seed}/best_model.zip', env=env)
+        elif model_name.startswith("AWET_DDPG"): 
             model = AWET_DDPG.load(f'{exp_path}/{model_name}/{seed}/best_model.zip', env=env)
         elif model_name.startswith("AWET_TD3"): 
             model = AWET_TD3.load(f'{exp_path}/{model_name}/{seed}/best_model.zip', env=env)
         elif model_name.startswith("AWET_SAC"):  
             model = AWET_SAC.load(f'{exp_path}/{model_name}/{seed}/best_model.zip', env=env)
         else:
-            raise ValueError(f"The agent name must starts with 'AWET_DDPG', 'AWET_TD3', or 'AWET_SAC' and not {model_name}")
+            raise ValueError(f"The agent name must starts with 'DDPG', 'TD3', 'SAC', 'AWET_DDPG', 'AWET_TD3', or 'AWET_SAC' and not {model_name}")
 
-        if env_name in ['CustomPendulumDense-v1', 'CustomPendulumSparse-v1']:
+        if 'Pendulum' in env_name:
             response, reward, success, eps_len, test_time = test_pendulum(env, model, num_episodes, render)
         else:
             response, reward, success, eps_len, test_time = test_envs(env, model, num_episodes, render)
@@ -135,6 +143,8 @@ def Tester(params):
     env_name = params['general_params']['env_name']
     exp_path = f"experiments/{params['general_params']['env_name']}/{params['general_params']['exp_name']}"
     models = listdirs(exp_path)
+
+    models.remove('tensorboard_logs') # Ignore the tensorboard logs folder
 
     results_df = pd.DataFrame(columns = ['env_name', 'model_name', 'seed', 'res_mean', 'res_std', 'rew_avg', 'success_rate', 'test_time', 'eps_len'])
 

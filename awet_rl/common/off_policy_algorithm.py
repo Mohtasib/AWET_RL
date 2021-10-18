@@ -397,7 +397,7 @@ class OffPolicyAlgorithm(BaseAlgorithm):
             replay_data = replay_buffer.sample(batch_size, env=self._vec_normalize_env)
 
             # Get target Q-values from the expert data
-            target_q_values = replay_data.rewards # Note: the q_values are stored in the expert replay buffer as rewards
+            target_q_values = replay_data.extras # Note: the q_values are stored in the expert replay buffer as extras
 
             # Get current Q-values estimates for each critic network
             # using action from the replay buffer

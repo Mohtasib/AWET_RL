@@ -29,13 +29,23 @@ def sample_n_demos(expert_demos, num_demos):
     if num_demos < len(expert_demos):
         demos = sample(range(len(expert_demos)),num_demos)
         new_demos = dict()
+        demo_names = list(expert_demos.keys())
         for i in range(len(demos)):
-            new_demos[f'demo{i}'] = expert_demos[f'demo{demos[i]}']
+            new_demos[demo_names[i]] = expert_demos[demo_names[i]]
         return new_demos   
     else:
         return expert_demos
 
-def calculate_q_values(data, gamma=0.99):
+def calculate_q(rewards, dones, gamma=0.98):
+    rewards = rewards.astype(np.float32, copy=False)
+    dones = dones.astype(np.float32, copy=False)
+    q_values = np.zeros_like(rewards)
+    for j in range(1, rewards.shape[0]+1):
+        q_values[-j] = rewards[-j] + (1- dones[-j]) * gamma * q_values[-j+1]
+    
+    return q_values
+
+def calculate_q_values(data, gamma=0.98):
     """
     This method recieves the data in the form:
     data = { 'demo0':{'obs':demo0_obs, 'next_obs':demo0_next_obs, 'actions':demo0_actions, 'rewards':demo0_rewards, 'dones':demo0_dones},
@@ -49,25 +59,30 @@ def calculate_q_values(data, gamma=0.99):
              'demon':{'obs':demon_obs, 'next_obs':demon_next_obs, 'actions':demon_actions, 'rewards':demon_rewards, 'dones':demon_dones, 'q_values':demon_q_values}}
     """
     new_data = dict()
-    for i in range(len(data)):
-        demo = data[f'demo{i}']
+    for demo_name in list(data.keys()):
+        demo = data[demo_name]
         obs = demo['obs']
         next_obs = demo['next_obs']
         actions = demo['actions']
         rewards = demo['rewards']
         dones = demo['dones']
         
-        # print(f'trajectory obs = {obs[10:15]}')
         # Check the data sizes:
         assert obs.shape[0] == actions.shape[0] == rewards.shape[0], "Error!, Incompatible sizes"
 
-        q_values = np.zeros_like(rewards)
-        for j in range(1, rewards.shape[0]+1):
-            q_values[-j] = rewards[-j] + (1- dones[-j]) * gamma * q_values[-j+1]
+        q_values = calculate_q(rewards, dones, gamma)
         
-        new_data[f'demo{i}'] = {'obs':obs, 'next_obs':next_obs, 'actions':actions, 'rewards':rewards, 'dones':dones, 'q_values':q_values}
+        new_data[demo_name] = {'obs':obs, 'next_obs':next_obs, 'actions':actions, 'rewards':rewards, 'dones':dones, 'q_values':q_values}
 
     return new_data
+
+def calculate_average_sum_rewards(data):
+    average_rewards = []
+    for demo_name in list(data.keys()):
+        demo = data[demo_name]
+        rewards = demo['rewards'].astype(np.float32, copy=False)
+        average_rewards.append(np.sum(rewards))
+    return np.array(average_rewards).mean()
 
 def create_transitions(data):
     """
@@ -84,8 +99,8 @@ def create_transitions(data):
     """
     transitions = dict()
     count = 0
-    for i in range(len(data)):
-        demo = data[f'demo{i}']
+    for demo_name in list(data.keys()):
+        demo = data[demo_name]
         obs = demo['obs']
         next_obs = demo['next_obs']
         actions = demo['actions']
@@ -101,8 +116,8 @@ def create_transitions(data):
 
 def create_trajectories(data):
     trajectories = []
-    for i in range(len(data)):
-        demo = data[f'demo{i}']
+    for demo_name in list(data.keys()):
+        demo = data[demo_name]
         trajectory = demo['obs']
         trajectory = np.expand_dims(trajectory, axis=0)
         trajectories.append(trajectory)
