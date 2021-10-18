@@ -1,7 +1,0 @@
-README.md
-setup.py
-awet_rl.egg-info/PKG-INFO
-awet_rl.egg-info/SOURCES.txt
-awet_rl.egg-info/dependency_links.txt
-awet_rl.egg-info/requires.txt
-awet_rl.egg-info/top_level.txt
