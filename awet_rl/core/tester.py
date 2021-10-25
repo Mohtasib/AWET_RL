@@ -144,7 +144,8 @@ def Tester(params):
     exp_path = f"experiments/{params['general_params']['env_name']}/{params['general_params']['exp_name']}"
     models = listdirs(exp_path)
 
-    models.remove('tensorboard_logs') # Ignore the tensorboard logs folder
+    if 'tensorboard_logs' in models:
+        models.remove('tensorboard_logs') # Ignore the tensorboard logs folder
 
     results_df = pd.DataFrame(columns = ['env_name', 'model_name', 'seed', 'res_mean', 'res_std', 'rew_avg', 'success_rate', 'test_time', 'eps_len'])
 

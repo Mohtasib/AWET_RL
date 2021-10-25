@@ -36,7 +36,8 @@ def load_dataset(path, condition, max_num_episodes, smooth_window):
 def load_all_dataset(path, max_num_episodes=2000, smooth_window=200):
     dirlist = listdirs(path)
 
-    dirlist.remove('tensorboard_logs') # Ignore the tensorboard logs folder
+    if 'tensorboard_logs' in dirlist:
+        dirlist.remove('tensorboard_logs') # Ignore the tensorboard logs folder
 
     data = []
     for subdir in dirlist:
